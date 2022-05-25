@@ -2,11 +2,13 @@ var bgImg;
 var chao;
 var kleiton, kleitonImg;
 var kleitonShooter;
+var zombieImg;
 
 function preload() {
   bgImg = loadImage("assets/bg.jpeg");
   kleitonImg = loadImage("assets/shooter_1.png");
   kleitonShooter = loadImage("assets/shooter_3.png")
+  zombieImg = loadImage("assets/zombie.png");
 }
 
 function setup() {
@@ -38,5 +40,15 @@ function draw() {
   if (keyWentUp("space")){
     kleiton.changeImage("imagem1");
   }
+  createZombie();
   drawSprites();
+}
+function createZombie(){
+  if (frameCount%150 == 0){
+    var zombie = createSprite(width,random(height-chao.height,height),40,40);
+    zombie.addImage(zombieImg)
+    zombie.velocityX = -3
+    zombie.scale = 0.12
+
+  }
 }
