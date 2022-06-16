@@ -12,7 +12,7 @@ function preload() {
   bgImg = loadImage("assets/bg.jpeg");
   kleitonImg = loadAnimation("assets/correndo1.png", "assets/correndo2.png");
   kleitonImg.frameDelay = 10;
-  kleitonShooter = loadAnimation("assets/atirando1.png", "assets/atirando2.png")
+  kleitonShooter = loadAnimation("assets/atirando1.png", "assets/atirando2.png");
   zombieImg = loadImage("assets/zumbi.png");
   explosionSound = loadSound("assets/explosion.mp3");
   lose = loadSound("assets/lose.mp3");
@@ -44,16 +44,17 @@ function draw() {
       gameState = "won";
     }
     if (life == 0) {
-
       lose.play();
       gameState = "lost";
     }
+    // limite do caminhar do kleiton
     if (kleiton.y > height - 60) {
       kleiton.y = height - 60;
     }
     if (kleiton.y < height - chao.height) {
       kleiton.y = height - chao.height;
     }
+    //controles
     if (keyDown("UP_ARROW")) {
       kleiton.y = kleiton.y - 30;
     }
@@ -67,7 +68,9 @@ function draw() {
     if (keyWentUp("space")) {
       kleiton.changeAnimation("normal");
     }
-    createZombie();
+    var frames = 2 * (100 - score);
+    console.log(frames)
+    createZombie(frames);
     zumbiDestroy();
     lostLife();
   }
@@ -88,11 +91,11 @@ function draw() {
   drawSprites();
 }
 
-function createZombie() {
-  if (frameCount % 150 == 0) {
+function createZombie(frames) {
+  if (frameCount % frames == 0) {
     var zombie = createSprite(width, random(height - chao.height, height), 40, 40);
     zombie.addImage(zombieImg);
-    zombie.velocityX = -3;
+    zombie.velocityX = -6;
     zombie.scale = 0.5;
     zombie.lifetime = width / zombie.velocityX;
     zumbiGroup.add(zombie);
@@ -100,14 +103,27 @@ function createZombie() {
 }
 
 function shoot() {
-
+  var bala = createSprite(kleiton.x - 30,kleiton.y-10,10,5);
+  bala.velocityX = 10;
+  // velocidade = largura / tempo
+  // tempo = largura / velocidade
+  bala.lifetime = width / bala.velocityX;
+  balaGroup.add(bala);
 }
 
 function zumbiDestroy() {
   if (zumbiGroup.isTouching(balaGroup)) {
-    for (var i = 0; i < zumbiGroup.length; i++) {
+    // laço de repetição
+    // 2
+    for (var i = 0; i < zumbiGroup.length; i = i + 1) {
       if(zumbiGroup[i].isTouching(balaGroup)) {
-     
+        for (var c = 0; c < balaGroup.length; c++) {
+          if(zumbiGroup[i].isTouching(balaGroup[c])) {
+            zumbiGroup[i].destroy();
+            score = score + 5;
+            balaGroup[c].destroy();
+          }
+        }
       }
     }
   }
